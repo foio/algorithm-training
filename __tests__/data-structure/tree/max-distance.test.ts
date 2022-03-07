@@ -1,5 +1,5 @@
-import { findMaxPath } from '../../../src/algorithm/others/max-distance';
-import { buildTree } from './utils/tree';
+import { findMaxPath } from '../../../src/data-structure/tree/max-distance';
+import { buildTree } from '../../algorithm/others/utils/tree';
 
 describe('max distance', () => {
   it('find max path', () => {

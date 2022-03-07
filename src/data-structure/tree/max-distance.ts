@@ -1,8 +1,4 @@
-interface TreeNode {
-  value: number;
-  leftChild: TreeNode | undefined;
-  rightChild: TreeNode | undefined;
-}
+import { TreeNode } from './common';
 
 export function findMaxPath(root: TreeNode | undefined): number {
   if (!root) {
