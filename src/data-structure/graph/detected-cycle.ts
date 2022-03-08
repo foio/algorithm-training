@@ -12,7 +12,7 @@ export function detectCycle(graph: GraphNode): number[] {
   return circlePath;
 }
 
-export function detectCycleInner(
+function detectCycleInner(
   graph: GraphNode,
   path: number[],
   visited: { [key: number]: boolean },
