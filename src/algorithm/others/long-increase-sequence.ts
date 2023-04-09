@@ -26,10 +26,8 @@ export function calcLongSequenceWithDpTable(list: number[]): number {
   if (list.length <= 1) {
     return list.length;
   } else {
-    const dpTable: number[] = [];
-    for (let i = 0; i < list.length - 1; i++) {
-      dpTable[i] = 1;
-    }
+    const dpTable = new Array<number>(list.length);
+    dpTable.fill(1);
     for (let i = 0; i < list.length; i++) {
       for (let j = 0; j < i; j++) {
         if (list[i] > list[j]) {
@@ -38,9 +36,8 @@ export function calcLongSequenceWithDpTable(list: number[]): number {
       }
     }
     let res = 0;
-    console.log(dpTable);
     for (let i = 0; i < dpTable.length; i++) {
-      res = Math.max(dpTable[0], res);
+      res = Math.max(dpTable[i], res);
     }
     return res;
   }
