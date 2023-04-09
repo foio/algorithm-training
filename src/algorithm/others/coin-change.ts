@@ -14,61 +14,80 @@
 // 动态规划的一般流程就是三步：暴力的递归解法 -> 带备忘录的递归解法 -> 迭代的动态规划解法
 
 // 递归
-const mem: { [key: number]: number } = []; // 消除重叠子问题
+// 算法复杂度非常大(指数级):介于 coinTypes.lenght^(total/max(coinTypes))和coinTypes.lenght^(total/min(coinTypes))之间
 export function calcMinCoinsRecursive(
   coinTypes: number[],
   total: number,
 ): number {
-  if (mem[total] !== undefined) {
-    return mem[total];
-  }
   if (total === 0) {
     return 0;
-  } else if (total < 0) {
+  }
+  if (total < 0) {
     return -1;
   }
-  let minCoins = Number.MAX_VALUE;
-  for (let idx = 0; idx < coinTypes.length; idx++) {
-    // 子问题拆分
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const subMinCoins = calcMinCoinsRecursive(
-      coinTypes,
-      total - coinTypes[idx],
-    );
-    // 跳过异常情况
-    if (subMinCoins === -1) {
-      continue;
+  let minCoinsCnt = Number.MAX_SAFE_INTEGER;
+
+  for (let i = 0; i < coinTypes.length; i++) {
+    const curMinCnt = calcMinCoinsRecursive(coinTypes, total - coinTypes[i]);
+    if (curMinCnt >= 0) {
+      minCoinsCnt = Math.min(curMinCnt + 1, minCoinsCnt);
     }
-    minCoins = Math.min(1 + subMinCoins, minCoins);
   }
-  if (minCoins === Number.MAX_VALUE) {
-    mem[total] = -1;
-    return -1;
-  }
-  mem[total] = minCoins;
-  return minCoins;
+  return minCoinsCnt;
 }
 
-/*
-const minCoinsRecursive = calcMinCoinsRecursive([1,2,5,10], 133)
-console.log(minCoinsRecursive);
-*/
-
-// 迭代dp
-export function calcMinCoinsIntegration(
+// 递归使用mem剪枝
+// 算法复杂度非常大(指数级):介于 coinTypes.lenght*(total/max(coinTypes))和coinTypes.lenght*(total/min(coinTypes))之间
+const mem: { [key: number]: number } = {};
+export function calcMinCoinsRecursiveWithMem(
   coinTypes: number[],
   total: number,
 ): number {
-  // dp表
-  const dp = new Array<number>(total + 1);
-  dp.fill(total + 1, 0);
-  //
-  dp[0] = 0;
-  for (let idx = 0; idx <= total; idx++) {
-    for (const coinType of coinTypes) {
-      if (idx - coinType < 0) continue;
-      dp[idx] = Math.min(dp[idx - coinType] + 1, dp[idx]);
+  if (mem[total]) {
+    return mem[total];
+  }
+
+  if (total === 0) {
+    mem[total] = 0;
+    return 0;
+  }
+  if (total < 0) {
+    mem[total] = -1;
+    return -1;
+  }
+  let minCoinsCnt = Number.MAX_SAFE_INTEGER;
+
+  for (let i = 0; i < coinTypes.length; i++) {
+    const curMinCnt = calcMinCoinsRecursiveWithMem(
+      coinTypes,
+      total - coinTypes[i],
+    );
+    if (curMinCnt >= 0) {
+      minCoinsCnt = Math.min(curMinCnt + 1, minCoinsCnt);
     }
   }
-  return dp[total] == total + 1 ? -1 : dp[total];
+  mem[total] = minCoinsCnt == Number.MAX_SAFE_INTEGER ? -1 : minCoinsCnt;
+  return mem[total];
+}
+
+/**
+ * 使用DP查表
+ */
+export function calcMinCoinsIntegrationWithDp(
+  coinTypes: number[],
+  total: number,
+): number {
+  const dpTable = new Array<number>(total + 1);
+  dpTable.fill(total + 1);
+  dpTable[0] = 0;
+  for (let i = 0; i <= total; i++) {
+    for (const coinType of coinTypes) {
+      if (i - coinType < 0) {
+        continue;
+      }
+      dpTable[i] = Math.min(dpTable[i - coinType] + 1, dpTable[i]);
+    }
+  }
+
+  return dpTable[total] === total + 1 ? -1 : dpTable[total];
 }
